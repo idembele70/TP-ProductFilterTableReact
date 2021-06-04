@@ -1,50 +1,18 @@
-import { Component, useState } from "react";
+import { Component, memo, PureComponent } from "react";
 
-const PRODUCTSDATA = [
-  {
-    category: "Sporting Goods",
-    price: "$49.99",
-    stocked: true,
-    name: "Football",
-  },
-  {
-    category: "Sporting Goods",
-    price: "$9.99",
-    stocked: true,
-    name: "Baseball",
-  },
-  {
-    category: "Sporting Goods",
-    price: "$29.99",
-    stocked: false,
-    name: "Basketball",
-  },
-  {
-    category: "Electronics",
-    price: "$99.99",
-    stocked: true,
-    name: "iPod Touch",
-  },
-  {
-    category: "Electronics",
-    price: "$399.99",
-    stocked: false,
-    name: "iPhone 5",
-  },
-  { category: "Electronics", price: "$199.99", stocked: true, name: "Nexus 7" },
-];
-
-function ProductRow({ produit }) {
-  const { name, price, stocked } = produit;
-  const className = stocked ? "text-dark" : "text-danger";
-  return (
-    <tr>
-      <td className={className}>{name}</td>
-      <td>{price}</td>
-    </tr>
-  );
+class ProductRow extends PureComponent {
+  render() {
+    console.log("render");
+    const { name, price, stocked } = this.props.produit;
+    const className = stocked ? "text-dark" : "text-danger";
+    return (
+      <tr>
+        <td className={className}>{name}</td>
+        <td>{price}</td>
+      </tr>
+    );
+  }
 }
-
 function ProductCategoryRow({ category }) {
   return (
     <tr>
@@ -58,7 +26,8 @@ function ProductTable({ filteredText, isstocked, product }) {
     const row = [];
     let passedCategory = null;
     data.forEach((product, i) => {
-      if (!product.name.match(filteredText) || (isstocked && !product.stocked)) return;
+      if (!product.name.match(filteredText) || (isstocked && !product.stocked))
+        return;
       if (passedCategory !== product.category) {
         row.push(
           <ProductCategoryRow
@@ -125,6 +94,9 @@ export default class ProductFilterTable extends Component {
     this.handleFilterChange = this.handleFilterChange.bind(this);
     this.handleShowStock = this.handleShowStock.bind(this);
   }
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps != this.props || nextState != this.state;
+  }
   handleFilterChange(filterText) {
     this.setState({ filterText });
   }
@@ -140,7 +112,11 @@ export default class ProductFilterTable extends Component {
           checked={this.state.showStocked}
           onShowStocked={this.handleShowStock}
         />
-        <ProductTable product={PRODUCTSDATA} filteredText={this.state.filterText} isstocked={this.state.showStocked} />
+        <ProductTable
+          product={this.props.product}
+          filteredText={this.state.filterText}
+          isstocked={this.state.showStocked}
+        />
       </div>
     );
   }
